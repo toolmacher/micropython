@@ -19,7 +19,7 @@ INC += -I$(BUILD)
 # compiler settings
 CWARN = -Wall -Werror
 CWARN += -Wpointer-arith -Wuninitialized
-CFLAGS = $(INC) $(CWARN) -ansi -std=gnu99 $(CFLAGS_MOD) $(COPT) $(CFLAGS_EXTRA)
+CFLAGS = $(INC) $(CWARN) -std=gnu99 $(CFLAGS_MOD) $(COPT) $(CFLAGS_EXTRA)
 CFLAGS += -fdata-sections -ffunction-sections -fno-asynchronous-unwind-tables
 
 # Debugging/Optimization
@@ -49,10 +49,10 @@ SRC_C = \
 	main.c \
 	gccollect.c \
 
-ifeq ($(OS),Windows_NT)
-    ifeq (,$(findstring MSYS,$(UNAME_S)))
-        SRC_C += windows/fmode.c
-    endif
+# Add fmode when compiling with mingw gcc
+COMPILER_TARGET := $(shell $(CC) -dumpmachine)
+ifneq (,$(findstring mingw,$(COMPILER_TARGET)))
+	SRC_C += windows/fmode.c
 endif
 
 OBJ = $(PY_O)

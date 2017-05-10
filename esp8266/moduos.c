@@ -58,10 +58,9 @@ STATIC mp_obj_tuple_t os_uname_info_obj = {
 };
 
 STATIC mp_obj_t os_uname(void) {
-    if (os_uname_info_obj.items[2] == NULL) {
-        const char *ver = system_get_sdk_version();
-        os_uname_info_obj.items[2] = mp_obj_new_str(ver, strlen(ver), false);
-    }
+    // We must populate the "release" field each time in case it was GC'd since the last call.
+    const char *ver = system_get_sdk_version();
+    os_uname_info_obj.items[2] = mp_obj_new_str(ver, strlen(ver), false);
     return (mp_obj_t)&os_uname_info_obj;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(os_uname_obj, os_uname);
@@ -94,6 +93,7 @@ STATIC const mp_rom_map_elem_t os_module_globals_table[] = {
     #endif
     #if MICROPY_VFS_FAT
     { MP_ROM_QSTR(MP_QSTR_VfsFat), MP_ROM_PTR(&mp_fat_vfs_type) },
+    { MP_ROM_QSTR(MP_QSTR_ilistdir), MP_ROM_PTR(&mp_vfs_ilistdir_obj) },
     { MP_ROM_QSTR(MP_QSTR_listdir), MP_ROM_PTR(&mp_vfs_listdir_obj) },
     { MP_ROM_QSTR(MP_QSTR_mkdir), MP_ROM_PTR(&mp_vfs_mkdir_obj) },
     { MP_ROM_QSTR(MP_QSTR_rmdir), MP_ROM_PTR(&mp_vfs_rmdir_obj) },

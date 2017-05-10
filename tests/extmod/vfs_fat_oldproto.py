@@ -1,9 +1,14 @@
 import sys
-import uerrno
 try:
-    import uos_vfs as uos
+    import uerrno
+    try:
+        import uos_vfs as uos
+    except ImportError:
+        import uos
 except ImportError:
-    import uos
+    print("SKIP")
+    sys.exit()
+
 try:
     uos.VfsFat
 except AttributeError:
@@ -48,10 +53,10 @@ uos.mount(vfs, "/ramdisk")
 with vfs.open("file.txt", "w") as f:
     f.write("hello!")
 
-print(vfs.listdir())
+print(list(vfs.ilistdir()))
 
 with vfs.open("file.txt", "r") as f:
     print(f.read())
 
 vfs.remove("file.txt")
-print(vfs.listdir())
+print(list(vfs.ilistdir()))

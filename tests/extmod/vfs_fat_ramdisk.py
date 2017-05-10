@@ -1,9 +1,14 @@
 import sys
-import uerrno
 try:
-    import uos_vfs as uos
+    import uerrno
+    try:
+        import uos_vfs as uos
+    except ImportError:
+        import uos
 except ImportError:
-    import uos
+    print("SKIP")
+    sys.exit()
+
 try:
     uos.VfsFat
 except AttributeError:
@@ -60,7 +65,7 @@ except OSError as e:
 
 with vfs.open("foo_file.txt", "w") as f:
     f.write("hello!")
-print(vfs.listdir())
+print(list(vfs.ilistdir()))
 
 print("stat root:", vfs.stat("/"))
 print("stat file:", vfs.stat("foo_file.txt")[:-3]) # timestamps differ across runs
@@ -71,7 +76,7 @@ print(b"hello!" in bdev.data)
 vfs.mkdir("foo_dir")
 vfs.chdir("foo_dir")
 print("getcwd:", vfs.getcwd())
-print(vfs.listdir())
+print(list(vfs.ilistdir()))
 
 with vfs.open("sub_file.txt", "w") as f:
     f.write("subdir file")
@@ -87,4 +92,4 @@ print("getcwd:", vfs.getcwd())
 uos.umount(vfs)
 
 vfs = uos.VfsFat(bdev)
-print(vfs.listdir(b""))
+print(list(vfs.ilistdir(b"")))
